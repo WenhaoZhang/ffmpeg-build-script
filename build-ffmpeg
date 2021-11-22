@@ -521,8 +521,8 @@ EOF
   CONFIGURE_OPTIONS+=("--enable-libx265")
 fi
 
-if build "libvpx" "1.10.0"; then
-  download "https://github.com/webmproject/libvpx/archive/refs/tags/v1.10.0.tar.gz" "libvpx-1.10.0.tar.gz"
+if build "libvpx" "1.11.0"; then
+  download "https://github.com/webmproject/libvpx/archive/refs/tags/v1.11.0.tar.gz" "libvpx-1.11.0.tar.gz"
 
   if [[ "$OSTYPE" == "darwin"* ]]; then
     echo "Applying Darwin patch"
@@ -534,48 +534,9 @@ if build "libvpx" "1.10.0"; then
   execute make -j $MJOBS
   execute make install
 
-  build_done "libvpx" "1.10.0"
+  build_done "libvpx" "1.11.0"
 fi
 CONFIGURE_OPTIONS+=("--enable-libvpx")
-
-if $NONFREE_AND_GPL; then
-  if build "xvidcore" "1.3.7"; then
-    download "https://downloads.xvid.com/downloads/xvidcore-1.3.7.tar.gz"
-    cd build/generic || exit
-    execute ./configure --prefix="${WORKSPACE}" --disable-shared --enable-static
-    execute make -j $MJOBS
-    execute make install
-
-    if [[ -f ${WORKSPACE}/lib/libxvidcore.4.dylib ]]; then
-      execute rm "${WORKSPACE}/lib/libxvidcore.4.dylib"
-    fi
-
-    if [[ -f ${WORKSPACE}/lib/libxvidcore.so ]]; then
-      execute rm "${WORKSPACE}"/lib/libxvidcore.so*
-    fi
-
-    build_done "xvidcore" "1.3.7"
-  fi
-  CONFIGURE_OPTIONS+=("--enable-libxvid")
-fi
-
-if $NONFREE_AND_GPL; then
-  if build "vid_stab" "1.1.0"; then
-    download "https://github.com/georgmartius/vid.stab/archive/v1.1.0.tar.gz" "vid.stab-1.1.0.tar.gz"
-
-    if $MACOS_M1; then
-      curl -s -o "$PACKAGES/vid.stab-1.1.0/fix_cmake_quoting.patch" https://raw.githubusercontent.com/Homebrew/formula-patches/5bf1a0e0cfe666ee410305cece9c9c755641bfdf/libvidstab/fix_cmake_quoting.patch
-      patch -p1 <fix_cmake_quoting.patch
-    fi
-
-    execute cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX="${WORKSPACE}" -DUSE_OMP=OFF -DENABLE_SHARED=off .
-    execute make
-    execute make install
-
-    build_done "vid_stab" "1.1.0"
-  fi
-  CONFIGURE_OPTIONS+=("--enable-libvidstab")
-fi
 
 if build "av1" "287164d"; then
   # libaom 287164d  == v3.2.0
@@ -593,18 +554,6 @@ if build "av1" "287164d"; then
   build_done "av1" "287164d"
 fi
 CONFIGURE_OPTIONS+=("--enable-libaom")
-
-if build "zimg" "3.0.3"; then
-  download "https://github.com/sekrit-twc/zimg/archive/refs/tags/release-3.0.3.tar.gz" "zimg-3.0.3.tar.gz" "zimg"
-  cd zimg-release-3.0.3 || exit
-  execute "${WORKSPACE}/bin/libtoolize" -i -f -q
-  execute ./autogen.sh --prefix="${WORKSPACE}"
-  execute ./configure --prefix="${WORKSPACE}" --enable-static --disable-shared
-  execute make -j $MJOBS
-  execute make install
-  build_done "zimg" "3.0.3"
-fi
-CONFIGURE_OPTIONS+=("--enable-libzimg")
 
 ##
 ## audio library
@@ -670,191 +619,6 @@ if command_exists "python3"; then
 
   CONFIGURE_OPTIONS+=("--enable-lv2")
 
-fi
-
-if build "opencore" "0.1.5"; then
-  download "https://sourceforge.net/projects/opencore-amr/files/opencore-amr/opencore-amr-0.1.5.tar.gz/download?use_mirror=gigenet" "opencore-amr-0.1.5.tar.gz"
-  execute ./configure --prefix="${WORKSPACE}" --disable-shared --enable-static
-  execute make -j $MJOBS
-  execute make install
-
-  build_done "opencore" "0.1.5"
-fi
-CONFIGURE_OPTIONS+=("--enable-libopencore_amrnb" "--enable-libopencore_amrwb")
-
-if build "lame" "3.100"; then
-  download "https://sourceforge.net/projects/lame/files/lame/3.100/lame-3.100.tar.gz/download?use_mirror=gigenet" "lame-3.100.tar.gz"
-  execute ./configure --prefix="${WORKSPACE}" --disable-shared --enable-static
-  execute make -j $MJOBS
-  execute make install
-
-  build_done "lame" "3.100"
-fi
-CONFIGURE_OPTIONS+=("--enable-libmp3lame")
-
-if build "opus" "1.3.1"; then
-  download "https://archive.mozilla.org/pub/opus/opus-1.3.1.tar.gz"
-  execute ./configure --prefix="${WORKSPACE}" --disable-shared --enable-static
-  execute make -j $MJOBS
-  execute make install
-
-  build_done "opus" "1.3.1"
-fi
-CONFIGURE_OPTIONS+=("--enable-libopus")
-
-if build "libogg" "1.3.3"; then
-  download "https://ftp.osuosl.org/pub/xiph/releases/ogg/libogg-1.3.3.tar.gz"
-  execute ./configure --prefix="${WORKSPACE}" --disable-shared --enable-static
-  execute make -j $MJOBS
-  execute make install
-  build_done "libogg" "1.3.3"
-fi
-
-if build "libvorbis" "1.3.6"; then
-  download "https://ftp.osuosl.org/pub/xiph/releases/vorbis/libvorbis-1.3.6.tar.gz"
-  execute ./configure --prefix="${WORKSPACE}" --with-ogg-libraries="${WORKSPACE}"/lib --with-ogg-includes="${WORKSPACE}"/include/ --enable-static --disable-shared --disable-oggtest
-  execute make -j $MJOBS
-  execute make install
-
-  build_done "libvorbis" "1.3.6"
-fi
-CONFIGURE_OPTIONS+=("--enable-libvorbis")
-
-if build "libtheora" "1.1.1"; then
-  download "https://ftp.osuosl.org/pub/xiph/releases/theora/libtheora-1.1.1.tar.gz"
-  sed "s/-fforce-addr//g" configure >configure.patched
-  chmod +x configure.patched
-  mv configure.patched configure
-  execute ./configure --prefix="${WORKSPACE}" --with-ogg-libraries="${WORKSPACE}"/lib --with-ogg-includes="${WORKSPACE}"/include/ --with-vorbis-libraries="${WORKSPACE}"/lib --with-vorbis-includes="${WORKSPACE}"/include/ --enable-static --disable-shared --disable-oggtest --disable-vorbistest --disable-examples --disable-asm --disable-spec
-  execute make -j $MJOBS
-  execute make install
-
-  build_done "libtheora" "1.1.1"
-fi
-CONFIGURE_OPTIONS+=("--enable-libtheora")
-
-if $NONFREE_AND_GPL; then
-  if build "fdk_aac" "2.0.2"; then
-    download "https://sourceforge.net/projects/opencore-amr/files/fdk-aac/fdk-aac-2.0.2.tar.gz/download?use_mirror=gigenet" "fdk-aac-2.0.2.tar.gz"
-    execute ./configure --prefix="${WORKSPACE}" --disable-shared --enable-static --enable-pic
-    execute make -j $MJOBS
-    execute make install
-
-    build_done "fdk_aac" "2.0.2"
-  fi
-  CONFIGURE_OPTIONS+=("--enable-libfdk-aac")
-fi
-
-##
-## image library
-##
-
-if build "libtiff" "4.3.0"; then
-  download "https://download.osgeo.org/libtiff/tiff-4.3.0.tar.gz"
-  execute ./configure --prefix="${WORKSPACE}" --disable-shared --enable-static
-  execute make -j $MJOBS
-  execute make install
-  build_done "libtiff" "4.3.0"
-fi
-if build "libpng" "1.6.37"; then
-  download "https://sourceforge.net/projects/libpng/files/libpng16/1.6.37/libpng-1.6.37.tar.gz/download?use_mirror=gigenet" "libpng-1.6.37.tar.gz"
-  export LDFLAGS="${LDFLAGS}"
-  export CPPFLAGS="${CFLAGS}"
-  execute ./configure --prefix="${WORKSPACE}" --disable-shared --enable-static
-  execute make -j $MJOBS
-  execute make install
-  build_done "libpng" "1.6.37"
-fi
-
-if build "libwebp" "1.2.1"; then
-  # libwebp can fail to compile on Ubuntu if these flags were left set to CFLAGS
-  CPPFLAGS=
-  download "https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.2.1.tar.gz" "libwebp-1.2.1.tar.gz"
-  execute ./configure --prefix="${WORKSPACE}" --disable-shared --enable-static --disable-gif --with-zlib-include="${WORKSPACE}"/include/ --with-zlib-lib="${WORKSPACE}"/lib
-  make_dir build
-  cd build || exit
-  execute cmake -DCMAKE_INSTALL_PREFIX="${WORKSPACE}" -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_BINDIR=bin -DCMAKE_INSTALL_INCLUDEDIR=include -DENABLE_SHARED=OFF -DENABLE_STATIC=ON ../
-  execute make -j $MJOBS
-  execute make install
-
-  build_done "libwebp" "1.2.1"
-fi
-CONFIGURE_OPTIONS+=("--enable-libwebp")
-
-##
-## other library
-##
-
-if build "libsdl" "2.0.14"; then
-  download "https://www.libsdl.org/release/SDL2-2.0.14.tar.gz"
-  execute ./configure --prefix="${WORKSPACE}" --disable-shared --enable-static
-  execute make -j $MJOBS
-  execute make install
-
-  build_done "libsdl" "2.0.14"
-fi
-
-if $NONFREE_AND_GPL; then
-  if build "srt" "1.4.3"; then
-    download "https://github.com/Haivision/srt/archive/v1.4.3.tar.gz" "srt-1.4.3.tar.gz"
-    export OPENSSL_ROOT_DIR="${WORKSPACE}"
-    export OPENSSL_LIB_DIR="${WORKSPACE}"/lib
-    export OPENSSL_INCLUDE_DIR="${WORKSPACE}"/include/
-    execute cmake . -DCMAKE_INSTALL_PREFIX="${WORKSPACE}" -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_BINDIR=bin -DCMAKE_INSTALL_INCLUDEDIR=include -DENABLE_SHARED=OFF -DENABLE_STATIC=ON -DENABLE_APPS=OFF -DUSE_STATIC_LIBSTDCXX=ON
-    execute make install
-
-    if [ -n "$LDEXEFLAGS" ]; then
-      sed -i.backup 's/-lgcc_s/-lgcc_eh/g' "${WORKSPACE}"/lib/pkgconfig/srt.pc # The -i.backup is intended and required on MacOS: https://stackoverflow.com/questions/5694228/sed-in-place-flag-that-works-both-on-mac-bsd-and-linux
-    fi
-
-    build_done "srt" "1.4.3"
-  fi
-  CONFIGURE_OPTIONS+=("--enable-libsrt")
-fi
-
-##
-## HWaccel library
-##
-
-if [[ "$OSTYPE" == "linux-gnu" ]]; then
-  if command_exists "nvcc"; then
-    if build "nv-codec" "11.1.5.0"; then
-      download "https://github.com/FFmpeg/nv-codec-headers/releases/download/n11.1.5.0/nv-codec-headers-11.1.5.0.tar.gz"
-      execute make PREFIX="${WORKSPACE}"
-      execute make install PREFIX="${WORKSPACE}"
-      build_done "nv-codec" "11.1.5.0"
-    fi
-    CFLAGS+=" -I/usr/local/cuda/include"
-    LDFLAGS+=" -L/usr/local/cuda/lib64"
-    CONFIGURE_OPTIONS+=("--enable-cuda-nvcc" "--enable-cuvid" "--enable-nvenc" "--enable-cuda-llvm")
-
-    if [ -z "$LDEXEFLAGS" ]; then
-      CONFIGURE_OPTIONS+=("--enable-libnpp") # Only libnpp cannot be statically linked.
-    fi
-
-    # https://arnon.dk/matching-sm-architectures-arch-and-gencode-for-various-nvidia-cards/
-    CONFIGURE_OPTIONS+=("--nvccflags=-gencode arch=compute_52,code=sm_52")
-  fi
-
-  # Vaapi doesn't work well with static links FFmpeg.
-  if [ -z "$LDEXEFLAGS" ]; then
-    # If the libva development SDK is installed, enable vaapi.
-    if library_exists "libva"; then
-      if build "vaapi" "1"; then
-        build_done "vaapi" "1"
-      fi
-      CONFIGURE_OPTIONS+=("--enable-vaapi")
-    fi
-  fi
-
-  if build "amf" "1.4.21.0"; then
-    download "https://github.com/GPUOpen-LibrariesAndSDKs/AMF/archive/refs/tags/v.1.4.21.tar.gz" "AMF-1.4.21.tar.gz" "AMF-1.4.21"
-    execute rm -rf "${WORKSPACE}/include/AMF"
-    execute mkdir -p "${WORKSPACE}/include/AMF"
-    execute cp -r "${PACKAGES}"/AMF-1.4.21/AMF-v.1.4.21/amf/public/include/* "${WORKSPACE}/include/AMF/"
-    build_done "amf" "1.4.21.0"
-  fi
-  CONFIGURE_OPTIONS+=("--enable-amf")
 fi
 
 ##
