@@ -521,23 +521,6 @@ EOF
   CONFIGURE_OPTIONS+=("--enable-libx265")
 fi
 
-if build "libvpx" "1.11.0"; then
-  download "https://github.com/webmproject/libvpx/archive/refs/tags/v1.11.0.tar.gz" "libvpx-1.11.0.tar.gz"
-
-  if [[ "$OSTYPE" == "darwin"* ]]; then
-    echo "Applying Darwin patch"
-    sed "s/,--version-script//g" build/make/Makefile >build/make/Makefile.patched
-    sed "s/-Wl,--no-undefined -Wl,-soname/-Wl,-undefined,error -Wl,-install_name/g" build/make/Makefile.patched >build/make/Makefile
-  fi
-
-  execute ./configure --prefix="${WORKSPACE}" --disable-unit-tests --disable-shared --as=yasm --enable-vp9-highbitdepth
-  execute make -j $MJOBS
-  execute make install
-
-  build_done "libvpx" "1.11.0"
-fi
-CONFIGURE_OPTIONS+=("--enable-libvpx")
-
 if build "av1" "287164d"; then
   # libaom 287164d  == v3.2.0
   download "https://aomedia.googlesource.com/aom/+archive/287164de79516c25c8c84fd544f67752c170082a.tar.gz" "av1.tar.gz" "av1"
