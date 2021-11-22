@@ -16,32 +16,40 @@ other than Debian 10 and macOS 11.x, because I don't have the resources or time 
 
 ## Installation
 
-### Common installation (macOS, Linux)
-
 ```bash
 $ git clone https://github.com/markus-perl/ffmpeg-build-script.git
 $ cd ffmpeg-build-script
 $ ./build-ffmpeg --build
 ```
 
-## Supported Codecs
+## Installed packages
 
-* `x264`: H.264 Video Codec (MPEG-4 AVC)
-* `x265`: H.265 Video Codec (HEVC)
-* `libsvtav1`: SVT-AV1 Encoder and Decoder
-* `aom`: AV1 Video Codec (Experimental and very slow!)
-* `librav1e`: rust based AV1 encoder (only available if [`cargo` is installed](https://doc.rust-lang.org/cargo/getting-started/installation.html)) 
-* `libdav1d`: Fastest AV1 decoder developed by the VideoLAN and FFmpeg communities and sponsored by the AOMedia (only available if `meson` and `ninja` are installed)
-* `fdk_aac`: Fraunhofer FDK AAC Codec
-* `xvidcore`: MPEG-4 video coding standard
-* `VP8/VP9/webm`: VP8 / VP9 Video Codec for the WebM video file format
-* `mp3`: MPEG-1 or MPEG-2 Audio Layer III
-* `ogg`: Free, open container format
-* `vorbis`: Lossy audio compression format
-* `theora`: Free lossy video compression format
-* `opus`: Lossy audio coding format
-* `srt`: Secure Reliable Transport
-* `webp`: Image format both lossless and lossy
+### Common tools
+
+* `pkg-config`: https://pkgconfig.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
+* `yasm`: https://github.com/yasm/yasm/releases/download/v1.3.0/yasm-1.3.0.tar.gz
+* `nasm`: https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/nasm-2.15.05.tar.xz
+* `zlib`: https://www.zlib.net/zlib-1.2.11.tar.gz
+* `m4`: https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.gz
+* `autoconf`: https://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.gz
+* `automake`: https://ftp.gnu.org/gnu/automake/automake-1.16.4.tar.gz
+* `libtool`: https://ftpmirror.gnu.org/libtool/libtool-2.4.6.tar.gz
+* `openssl`: https://www.openssl.org/source/openssl-1.1.1l.tar.gz
+* `cmake`: https://cmake.org/files/LatestRelease/cmake-3.22.0.tar.gz
+
+### Supported Codecs
+
+* `x264`: https://code.videolan.org/videolan/x264/-/archive/5db6aa6cab1b146e07b60cc1736a01f21da01154/x264-5db6aa6cab1b146e07b60cc1736a01f21da01154.tar.gz
+* `x265`: https://github.com/videolan/x265/archive/Release_3.5.tar.gz
+* `libsvtav1`: https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v0.8.7/SVT-AV1-v0.8.7.tar.gz 
+* `libaom`: https://aomedia.googlesource.com/aom/+archive/287164de79516c25c8c84fd544f67752c170082a.tar.gz
+* `librav1e`: https://github.com/xiph/rav1e/archive/refs/tags/v0.5.0.tar.gz (only available if [`cargo` is installed](https://doc.rust-lang.org/cargo/getting-started/installation.html)) 
+* `libdav1d`: https://code.videolan.org/videolan/dav1d/-/archive/0.9.2/dav1d-0.9.2.tar.gz (only available if `meson` and `ninja` are installed)
+* `libvpx`: https://github.com/webmproject/libvpx/archive/refs/tags/v1.11.0.tar.gz
+* `libvmaf`: https://github.com/Netflix/vmaf/archive/refs/tags/v2.3.0.tar.gz
+
+### ffmpeg
+* `ffmpeg`: https://github.com/FFmpeg/FFmpeg/archive/refs/heads/release/4.4.tar.gz
 
 ### Apple M1 (Apple Silicon) Support
 
